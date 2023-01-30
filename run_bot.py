@@ -18,7 +18,7 @@ config.read('config.ini') # read config.ini file
 api_id = config.get('default','api_id') # get the api id
 api_hash = config.get('default','api_hash') # get the api hash
 BOT_TOKEN = config.get('default','BOT_TOKEN') # get the bot token
-weather_key = config.get('default','weather_key') # read the key for the weather forecasts
+# weather_key = config.get('default','weather_key') # read the key for the weather forecasts
 
 # Create the client and the session called session_master. We start the session as the Bot (using bot_token)
 client = TelegramClient('sessions/session_master', api_id, api_hash).start(bot_token=BOT_TOKEN)
@@ -45,50 +45,7 @@ async def time(event):
     # Define the text and send the message
     text = "Received! Day and time: " + str(datetime.datetime.now())
     await client.send_message(SENDER, text, parse_mode="HTML")
-
-
-
-
-### Command to get the weather
-@client.on(events.NewMessage(pattern='/(?i)weather')) 
-async def weather(event):
-
-    # Get the sender of the message
-    sender = await event.get_sender()
-    SENDER = sender.id
-
-    try: 
-
-        # In this way, if the user send for example /weather new york , new york will be selected as the CITY
-        msg = event.message.text # /weather new york
-        after_command = msg.split(" ")[1:] # ['/weather', 'new', 'york']
-        city = ' '.join(after_command) # we get 'new york' 
-
-        # Define the URL to make the request
-        base_url = "http://api.openweathermap.org/data/2.5/weather?"
-        complete_url = base_url + "appid=" + weather_key + "&q=" + city
-
-        # Get response and parse it to JSON format
-        response = requests.get(complete_url)
-        json_weather = response.json() 
-
-        # If we get a good response, we send a specific message
-        if json_weather["cod"] != "404":
-            pred = json_weather['weather'][0]['main']
-            desc = json_weather['weather'][0]['description']
-            text = "Currently the weather in " + city + " is <b>" + str(pred) +"</b>, more specifically: <b>"+desc+"</b>"
-            await client.send_message(SENDER, text, parse_mode="HTML")
-
-    # Otherwhise we set a default message
-        else:
-            await client.send_message(SENDER, "I couldn't find the city....", parse_mode="HTML")
-
-    # If the user just send the /weather commandi without a CITY, we get and Exeption
-    except:
-        await client.send_message(SENDER, "Insert a city after the /weather command!", parse_mode="HTML")
-        return 
-    
-    
+  
 
   
 ## Function that waits user event [press button]
